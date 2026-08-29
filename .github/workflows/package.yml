@@ -25,20 +25,25 @@ jobs:
             -H "Authorization: Bearer $TOKEN" \
             "https://api.github.com/repos/MTCMarketing/ppm--packages-list/collaborators?per_page=100")
 
-          python3 -c '
-          import json, sys
+          python3 - "$PACKAGES" "$COLLABORATORS" <<'PY'
+          import json
+          import sys
 
           packages = json.loads(sys.argv[1])
           collaborators = json.loads(sys.argv[2])
 
-          names = [
-              p["name"] for p in packages
-              if p["name"].startswith("ppm--")
-          ]
+          for package in packages:
+              name = package["name"]
 
-          for name in names:
+              if not name.startswith("ppm--"):
+                  continue
+
               print(name)
+
               for user in collaborators:
-                  print(f"  - {user[\"login\"]}: {user.get(\"role_name\", \"unknown\")}")
+                  login = user["login"]
+                  role = user.get("role_name", "unknown")
+                  print(f"  - {login}: {role}")
+
               print()
-          ' "$PACKAGES" "$COLLABORATORS"
+          PY
