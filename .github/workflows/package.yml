@@ -1,19 +1,26 @@
-name: Package Published
+name: Update Package List
 
 on:
   registry_package:
     types: [published]
 
+permissions:
+  contents: write
+  packages: read
+
 jobs:
-  package-published:
+  update-packages:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Print triggering package
         run: |
           echo "Triggered by: ${{ github.event.registry_package.name }}"
 
-      - name: Print ppm packages
+      - name: Generate packages.json
         env:
           TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
@@ -27,20 +34,31 @@ jobs:
 
           packages = json.load(sys.stdin)
 
-          for package in packages:
-              name = package["name"]
+          names = sorted([
+              package["name"]
+              for package in packages
+              if package["name"].startswith("ppm--")
+          ])
 
-              if not name.startswith("ppm--"):
-                  continue
+          with open("packages.json", "w") as f:
+              json.dump({"packages": names}, f, indent=2)
+              f.write("\n")
 
-              repo = package.get("repository")
-
-              print(name)
-
-              if repo:
-                  print("  Repository:", repo.get("full_name", repo.get("name")))
-              else:
-                  print("  Repository: none")
-
-              print()
+          print("packages.json:")
+          print(json.dumps({"packages": names}, indent=2))
           '
+
+      - name: Commit packages.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add packages.json
+
+          if git diff --cached --quiet; then
+            echo "No package changes."
+            exit 0
+          fi
+
+          git commit -m "Update packages.json"
+          git push
