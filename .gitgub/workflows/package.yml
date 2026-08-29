@@ -1,0 +1,13 @@
+name: Package Published
+
+on:
+  registry_package:
+    types: [published]
+
+jobs:
+  package-published:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print package name
+        run: echo "Package: ${{ github.event.registry_package.name }}"
