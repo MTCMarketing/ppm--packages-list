@@ -10,4 +10,5 @@ jobs:
 
     steps:
       - name: Print package name
-        run: echo "Package: ${{ github.event.registry_package.name }}"
+        run: |
+          echo "Package: ${{ github.event.registry_package.name }}"
