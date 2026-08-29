@@ -13,11 +13,11 @@ jobs:
         run: |
           echo "Triggered by: ${{ github.event.registry_package.name }}"
 
-      - name: Print all package names
+      - name: Print ppm packages
         env:
           TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
           curl -s \
             -H "Authorization: Bearer $TOKEN" \
             "https://api.github.com/user/packages?package_type=npm&per_page=100" \
-            | python3 -c 'import sys,json; print("\n".join(x["name"] for x in json.load(sys.stdin)))'
+            | python3 -c 'import sys,json; print("\n".join(x["name"] for x in json.load(sys.stdin) if x["name"].startswith("ppm--")))'
