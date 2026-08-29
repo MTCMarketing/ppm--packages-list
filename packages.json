@@ -2,6 +2,7 @@
   "packages": [
     "ppm--actions--push-github-package",
     "ppm--actions--push-updates-to-website-package-updator",
+    "ppm--gforms",
     "ppm--gh-image",
     "ppm--infra--openbase--auth-multi-user--01",
     "ppm--key--worker--admin-role",
