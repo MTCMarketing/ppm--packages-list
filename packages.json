@@ -1,0 +1,28 @@
+{
+  "packages": [
+    "ppm--source--example-site-6",
+    "ppm--site--example-website",
+    "ppm--infra--openbase--auth-multi-user--01",
+    "ppm--source--example-site-2",
+    "ppm--source--example-site-3",
+    "ppm--source--example-website-4",
+    "ppm--source--example-site-5",
+    "ppm--actions--push-github-package",
+    "ppm--actions--push-updates-to-website-package-updator",
+    "ppm--key--worker--repo",
+    "ppm--key--worker--remote-content-key",
+    "ppm--key--worker--user-role",
+    "ppm--key--worker--admin-role",
+    "ppm--key--worker--cfauth-multi-jwt-secret",
+    "ppm--key--worker--domain",
+    "ppm--key--worker--owner",
+    "ppm--key--worker--ppm-identity",
+    "ppm--worker--github-image-connector",
+    "ppm--key--worker--origins",
+    "ppm--openbase-login",
+    "ppm--gh-image",
+    "ppm--openbase",
+    "ppm--opencms",
+    "ppm--opencms--gh-image"
+  ]
+}
