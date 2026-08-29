@@ -13,24 +13,19 @@ jobs:
         run: |
           echo "Triggered by: ${{ github.event.registry_package.name }}"
 
-      - name: Print ppm packages and collaborators
+      - name: Print ppm packages
         env:
           TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
-          PACKAGES=$(curl -s \
+          curl -s \
             -H "Authorization: Bearer $TOKEN" \
-            "https://api.github.com/user/packages?package_type=npm&per_page=100")
-
-          COLLABORATORS=$(curl -s \
-            -H "Authorization: Bearer $TOKEN" \
-            "https://api.github.com/repos/MTCMarketing/ppm--packages-list/collaborators?per_page=100")
-
-          python3 - "$PACKAGES" "$COLLABORATORS" <<'PY'
-          import json
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/user/packages?package_type=npm&per_page=100" \
+            | python3 -c '
           import sys
+          import json
 
-          packages = json.loads(sys.argv[1])
-          collaborators = json.loads(sys.argv[2])
+          packages = json.load(sys.stdin)
 
           for package in packages:
               name = package["name"]
@@ -38,12 +33,14 @@ jobs:
               if not name.startswith("ppm--"):
                   continue
 
+              repo = package.get("repository")
+
               print(name)
 
-              for user in collaborators:
-                  login = user["login"]
-                  role = user.get("role_name", "unknown")
-                  print(f"  - {login}: {role}")
+              if repo:
+                  print("  Repository:", repo.get("full_name", repo.get("name")))
+              else:
+                  print("  Repository: none")
 
               print()
-          PY
+          '
