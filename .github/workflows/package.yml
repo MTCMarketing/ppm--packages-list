@@ -13,11 +13,32 @@ jobs:
         run: |
           echo "Triggered by: ${{ github.event.registry_package.name }}"
 
-      - name: Print ppm packages
+      - name: Print ppm packages and collaborators
         env:
           TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
-          curl -s \
+          PACKAGES=$(curl -s \
             -H "Authorization: Bearer $TOKEN" \
-            "https://api.github.com/user/packages?package_type=npm&per_page=100" \
-            | python3 -c 'import sys,json; print("\n".join(x["name"] for x in json.load(sys.stdin) if x["name"].startswith("ppm--")))'
+            "https://api.github.com/user/packages?package_type=npm&per_page=100")
+
+          COLLABORATORS=$(curl -s \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://api.github.com/repos/MTCMarketing/ppm--packages-list/collaborators?per_page=100")
+
+          python3 -c '
+          import json, sys
+
+          packages = json.loads(sys.argv[1])
+          collaborators = json.loads(sys.argv[2])
+
+          names = [
+              p["name"] for p in packages
+              if p["name"].startswith("ppm--")
+          ]
+
+          for name in names:
+              print(name)
+              for user in collaborators:
+                  print(f"  - {user[\"login\"]}: {user.get(\"role_name\", \"unknown\")}")
+              print()
+          ' "$PACKAGES" "$COLLABORATORS"
