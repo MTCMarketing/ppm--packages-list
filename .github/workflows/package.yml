@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print package name
+      - name: Print triggering package
         run: |
-          echo "Package: ${{ github.event.registry_package.name }}"
+          echo "Triggered by: ${{ github.event.registry_package.name }}"
+
+      - name: Print all package names
+        env:
+          TOKEN: ${{ secrets.PACKAGE_TOKEN }}
+        run: |
+          curl -s \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://api.github.com/user/packages?package_type=npm&per_page=100" \
+            | python3 -c 'import sys,json; print("\n".join(x["name"] for x in json.load(sys.stdin)))'
